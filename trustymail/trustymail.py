@@ -197,7 +197,7 @@ def spf_scan(domain):
                 result = "neutral"
 
             try:
-                query = spf.query("127.0.0.1", "email_wizard@" + domain.domain_name, domain.domain_name, strict=2)
+                query = spf.query("127.0.0.1", "email_wizard@" + domain.domain_name, domain.domain_name, strict=2, verbose=True)
                 response = query.check()
             except spf.AmbiguityWarning as error:
                 logging.debug("\t" + error.msg)
