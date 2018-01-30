@@ -206,10 +206,10 @@ class Domain:
         mail_servers_that_support_tls13_rc4 = [x for x in self.cipher_results.keys() if self.cipher_results[x][
             'is_tls13_rc4']]
 
-        domain_supports_rc4 = False if mail_servers_that_support_tls10_rc4 is False or \
-                                       mail_servers_that_support_tls11_rc4 is False or \
-                                       mail_servers_that_support_tls12_rc4 is False or \
-                                       mail_servers_that_support_tls13_rc4 is False else True
+        domain_supports_rc4 = False
+        if bool(mail_servers_that_support_tls10_rc4) is True or bool(mail_servers_that_support_tls11_rc4) is True or \
+            bool(mail_servers_that_support_tls12_rc4) is True or bool(mail_servers_that_support_tls13_rc4) is True:
+            domain_supports_rc4 = True
 
         mail_servers_that_support_tls10_3des = [x for x in self.cipher_results.keys() if self.cipher_results[x][
             'is_tls10_3des']]
@@ -220,11 +220,11 @@ class Domain:
         mail_servers_that_support_tls13_3des = [x for x in self.cipher_results.keys() if self.cipher_results[x][
             'is_tls13_3des']]
 
+        domain_supports_3des = False
+        if bool(mail_servers_that_support_tls10_3des) is True or bool(mail_servers_that_support_tls11_3des) is True or \
+                bool(mail_servers_that_support_tls12_3des) is True or bool(mail_servers_that_support_tls13_3des) is True:
+            domain_supports_3des = True
 
-        domain_supports_3des = False if mail_servers_that_support_tls10_3des is False or \
-                                        mail_servers_that_support_tls11_3des is False or \
-                                        mail_servers_that_support_tls12_3des is False or \
-                                        mail_servers_that_support_tls13_3des is False else True
 
         domain_supports_cipher_results = False
         if domain_supports_3des is True or domain_supports_rc4 is True or domain_supports_sslv2 is True or domain_supports_sslv3 is True:
