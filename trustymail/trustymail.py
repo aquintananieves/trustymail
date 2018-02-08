@@ -359,7 +359,7 @@ def cipher_protocol_scan(domain, smtp_cache):
                 domain.cipher_results[server_and_port] = _SMTP_CIPHER_CACHE[server_and_port]
         else:
             if not smtp_cache or (server_and_port not in _SMTP_CIPHER_CACHE):
-                logging.debug('\tUsing Failed Result due to STARTTLS=FALSE for: ' + server_and_port)
+                logging.debug('\tUsing False Result due to STARTTLS=FALSE for: ' + server_and_port)
                 domain.cipher_results[server_and_port] = {}
                 domain.cipher_results[server_and_port]['is_tls10_rc4'] = False
                 domain.cipher_results[server_and_port]['is_tls10_3des'] = False

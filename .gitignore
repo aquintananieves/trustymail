@@ -3,7 +3,7 @@ todo.txt
 *.json
 *.sqlite
 .DS_Store
-
+lists.csv
 .cache/
 cache/
 
