@@ -636,6 +636,8 @@ def dmarc_scan(resolver, domain):
                         msg = 'Unknown DMARC subdomain policy {0}'.format(tag_dict[tag])
                         handle_syntax_error('[DMARC]', domain, '{0}'.format(msg))
                         domain.valid_dmarc = False
+                    else:
+                        domain.dmarc_subdomain_policy = tag_dict[tag]
                 elif tag == 'fo':
                     values = tag_dict[tag].split(':')
                     if '0' in values and '1' in values:
@@ -663,23 +665,29 @@ def dmarc_scan(resolver, domain):
                 elif tag == 'pct':
                     try:
                         pct = int(tag_dict[tag])
-                        if pct < 0 or pct > 100:
+                        if pct <= 0 or pct > 100:
                             msg = 'Error: invalid DMARC pct tag value: {0} - must be an integer between ' \
                                   '0 and 100'.format(tag_dict[tag])
                             handle_syntax_error('[DMARC]', domain, '{0}'.format(msg))
                             domain.valid_dmarc = False
                         domain.dmarc_pct = pct
                         if pct < 100:
+<<<<<<< HEAD
                             msg = 'Error: The DMARC pct tag value must not be less than 100 ' \
                                   '(the implicit default), so that the policy applies to all mail'
                             handle_syntax_error('[DMARC]', domain, msg)
                             domain.valid_dmarc = False
+=======
+                            handle_syntax_error('[DMARC]', domain, 'Warning: The DMARC pct tag value may be less than 100 (the implicit default) during deployment, but should be removed or set to 100 upon full deployment')
+>>>>>>> upstream/develop
                     except ValueError:
                         msg = 'invalid DMARC pct tag value: {0} - must be an integer'.format(tag_dict[tag])
                         handle_syntax_error('[DMARC]', domain, '{0}'.format(msg))
                         domain.valid_dmarc = False
                 elif tag == 'rua' or tag == 'ruf':
                     uris = tag_dict[tag].split(',')
+                    if len(uris) > 2:
+                        handle_syntax_error('[DMARC]', domain, 'Warning: The {} tag specifies {} URIs.  Receivers are not required to send reports to more than two URIs - https://tools.ietf.org/html/rfc7489#section-6.2.'.format(tag, len(uris)))
                     for uri in uris:
                         # mailto: is currently the only type of DMARC URI
                         parsed_uri = parse_dmarc_report_uri(uri)
@@ -716,6 +724,12 @@ def dmarc_scan(resolver, domain):
                                                                            'address {0} does not have any '
                                                                            'MX records'.format(email_address))
                                     domain.valid_dmarc = False
+
+            # Log a warning if the DMARC record specifies a policy but does not
+            # specify any ruf or rua URIs, since this greatly reduces the
+            # usefulness of DMARC.
+            if 'p' in tag_dict and 'rua' not in tag_dict and 'ruf' not in tag_dict:
+                handle_syntax_error('[DMARC]', domain, 'Warning: A DMARC policy is specified but no reporting URIs.  This makes the DMARC implementation considerably less useful that it could be.  See https://tools.ietf.org/html/rfc7489#section-6.5 for more details.')
 
         domain.dmarc_has_aggregate_uri = len(domain.dmarc_aggregate_uris) > 0
         domain.dmarc_has_forensic_uri = len(domain.dmarc_forensic_uris) > 0
